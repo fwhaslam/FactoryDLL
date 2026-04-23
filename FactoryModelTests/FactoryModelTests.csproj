@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!-- see Directory.Build.props for additional properties -->
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MSTest.TestAdapter" Version="2.2.5" />
+        <PackageReference Include="MSTest.TestFramework" Version="2.2.5" />
+        <PackageReference Include="VerboseCSharp" Version="1.0.1" />
+        <PackageReference Include="xunit.assert" Version="2.4.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\FactoryModel\FactoryModel.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,18 @@
+<Project>
+
+  <!-- properties shared by all projects in solution -->
+
+  <PropertyGroup>
+    
+    <!-- maximunm .net version that can be used with Unity -->
+    <TargetFramework>net48</TargetFramework>
+    
+    <!-- '-alpha' means pre-release version -->
+    <Version>0.0.1-alpha</Version>
+
+    <!-- max language for net48 version :: beware confusing version information  -->
+    <LangVersion>8.0</LangVersion>
+    
+  </PropertyGroup>
+
+</Project>
