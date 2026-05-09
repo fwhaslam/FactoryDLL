@@ -1,10 +1,16 @@
-﻿using System;
+﻿// Copyright (c) 2026 Frederick William Haslam born 1962 in the USA.
+// Licensed under "The MIT License" https://opensource.org/license/mit/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FactoryModel.Models;
-using FactoryModel.Models.Enums;
+using FactoryModel.Models.Constants;
+
+using static FactoryModel.Models.Constants.FacilityTypeEnum;
+using static FactoryModel.Models.Constants.FacilityTypeInfo;
 
 namespace FactoryModel.Builder {
 
@@ -54,9 +60,9 @@ namespace FactoryModel.Builder {
         /// 
         /// </summary>
         /// <param name="loc"></param>
-        /// <param name="facility"></param>
+        /// <param name="facility">Template for first tile.  Ignored as we drag belts around.</param>
         /// <returns>List[Where] - locations changed by this change </returns>
-        public List<Where> SubmitToPlan( Where loc, FacilityTypeEnum facility ) {
+        public List<Where> SubmitBeltToPlan( Where loc ) {
 
             var touched = new List<Where>();
             if (!Map.InBounds(loc)) return touched;
@@ -70,13 +76,13 @@ namespace FactoryModel.Builder {
             if (tile.Type==TileTypeEnum.Sea) return touched;
 
             // add change to plan
-            var work = new Tile(loc,facility);
+            var work = new Tile(loc,FacilityTypeEnumInfo.DEFAULT_BELT_ENUM);
             Plan.Put( work );
             touched.Add(loc);
 
             // cleanup
             if (LastTile!=null) touched.Add( LastTile.Loc );
-            FixFacilityLinks( LastTile, work );
+            FixBeltLinks( LastTile, work );
             LastTile = work;
  
            return touched;
@@ -108,19 +114,20 @@ namespace FactoryModel.Builder {
 
 //=====================================================================================================================
 
-        internal static Where EAST_STEP = new Where( -1, 0 );
-        internal static Where WEST_STEP = new Where( +1, 0 );
-        internal static Where NORTH_STEP = new Where( 0, -1 );
-        internal static Where SOUTH_STEP = new Where( 0, +1 );
+        internal static readonly Where NORTH_STEP = new Where( 0, +1 );
+        internal static readonly Where SOUTH_STEP = new Where( 0, -1 );
+
+        internal static readonly Where EAST_STEP = new Where( +1, 0 );
+        internal static readonly Where WEST_STEP = new Where( -1, 0 );
 
         internal bool IsAdjacent( Where diff ) {
             if (diff==null) return false;
             return ( Math.Abs(diff.X) + Math.Abs(diff.Y) ) == 1;
         }
 
-        internal void FixFacilityLinks( Tile lastTile, Tile currentTile ) {
+        internal void FixBeltLinks( Tile lastTile, Tile currentTile ) {
 
-            var diff = ( lastTile==null ? null : currentTile.Loc.Minus( lastTile.Loc ) );
+            var diff = ( lastTile==null ? null : lastTile.Loc.Minus( currentTile.Loc ) );
 
             // last tile is missing or not adjacent: adjust one tile
             if ( !IsAdjacent(diff) ) {
@@ -130,6 +137,7 @@ namespace FactoryModel.Builder {
             else {
                 MergeBelt( currentTile, diff );
                 Plan.Put( currentTile );
+
                 MergeBelt( lastTile, null );
                 Plan.Put( lastTile );
             }
@@ -144,10 +152,10 @@ namespace FactoryModel.Builder {
 
             var loc = work.Loc;
 
-            var eastLink = GetLink( loc.X-1, loc.Y, (t) => FacilityTypeInfo.EastLink(t.Facility) );
-            var westLink = GetLink( loc.X+1, loc.Y, (t) => FacilityTypeInfo.WestLink(t.Facility) );
-            var northLink = GetLink( loc.X, loc.Y-1, (t) => FacilityTypeInfo.NorthLink(t.Facility) );
-            var southLink = GetLink( loc.X, loc.Y+1, (t) => FacilityTypeInfo.SouthLink(t.Facility) );
+            var northLink = GetLink( loc.X, loc.Y+1, (t) => FacilityTypeInfo.InverseSouthLink(t.Facility) );   // NORTH_STEP
+            var southLink = GetLink( loc.X, loc.Y-1, (t) => FacilityTypeInfo.InverseNorthLink(t.Facility) );   // SOUTH_STEP
+            var eastLink = GetLink( loc.X+1, loc.Y, (t) => FacilityTypeInfo.InverseWestLink(t.Facility) ); // EAST_STEP
+            var westLink = GetLink( loc.X-1, loc.Y, (t) => FacilityTypeInfo.InverseEastLink(t.Facility) ); // WEST_STEP
 
             // direction to previous tile, dragging
             if (drag!=null) { 

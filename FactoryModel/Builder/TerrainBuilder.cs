@@ -10,8 +10,8 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using FactoryModel.Models;
-using FactoryModel.Models.Enums;
-using static FactoryModel.Models.Enums.TileTypeEnum;
+using FactoryModel.Models.Constants;
+using static FactoryModel.Models.Constants.TileTypeEnum;
 
 namespace FactoryModel.Builder {
 

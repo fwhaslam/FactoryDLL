@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FactoryModel.Models.Enums {
+namespace FactoryModel.Models.Constants {
 
     public enum TileTypeEnum {
         Sea,

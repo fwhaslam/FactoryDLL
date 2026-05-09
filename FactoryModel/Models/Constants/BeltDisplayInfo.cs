@@ -3,13 +3,13 @@
 
 using System.Collections.Generic;
 
-using static FactoryModel.Models.Enums.FacilityTypeEnum;
-using static FactoryModel.Models.Enums.BeltDisplayBaseEnum;
+using static FactoryModel.Models.Constants.FacilityTypeEnum;
+using static FactoryModel.Models.Constants.BeltDisplayBaseEnum;
 using FactoryModel.Tools;
 
 using static FactoryModel.Tools.SystemTools;
 
-namespace FactoryModel.Models.Enums {
+namespace FactoryModel.Models.Constants {
     
     /// <summary>
     /// Base belt display types.  
@@ -17,7 +17,7 @@ namespace FactoryModel.Models.Enums {
     /// </summary>
     public enum BeltDisplayBaseEnum {
         OneInOutThru,   // orient: W2E
-        OneInOutBend,   // orient: W2S
+        OneInOutRight,   // orient: W2S
         OneInTwoOutTee, // TwoInOneOutTee   // orient: W2NS
         OneInTwoOutRight,   // TwoInOneOutXXX   // orient: W2SE
         OneInTwoOutLeft,    // TwoInOneOutXXX   // orient: W2NE
@@ -52,20 +52,20 @@ namespace FactoryModel.Models.Enums {
         internal static readonly List<BeltDisplayInfo> BeltDisplayList = new List<BeltDisplayInfo>() {
 
             // 1 in, 1 out ( 12 total )
-            new BeltDisplayInfo(BeltE2W,OneInOutThru,0,false),
-            new BeltDisplayInfo(BeltW2E,OneInOutThru,2,false),
+            new BeltDisplayInfo(BeltE2W,OneInOutThru,2,false),
+            new BeltDisplayInfo(BeltW2E,OneInOutThru,0,false),
             new BeltDisplayInfo(BeltN2S,OneInOutThru,1,false),
             new BeltDisplayInfo(BeltS2N,OneInOutThru,3,false),
 
-            new BeltDisplayInfo(BeltN2W,OneInOutBend,1,false),
-            new BeltDisplayInfo(BeltE2N,OneInOutBend,2,false),
-            new BeltDisplayInfo(BeltS2E,OneInOutBend,3,false),
-            new BeltDisplayInfo(BeltW2S,OneInOutBend,0,false),
+            new BeltDisplayInfo(BeltN2W,OneInOutRight,1,false),
+            new BeltDisplayInfo(BeltE2N,OneInOutRight,2,false),
+            new BeltDisplayInfo(BeltS2E,OneInOutRight,3,false),
+            new BeltDisplayInfo(BeltW2S,OneInOutRight,0,false),
 
-            new BeltDisplayInfo(BeltW2N,OneInOutBend,1,true),
-            new BeltDisplayInfo(BeltN2E,OneInOutBend,2,true),
-            new BeltDisplayInfo(BeltE2S,OneInOutBend,3,true),
-            new BeltDisplayInfo(BeltS2W,OneInOutBend,0,true),
+            new BeltDisplayInfo(BeltW2N,OneInOutRight,1,true),
+            new BeltDisplayInfo(BeltN2E,OneInOutRight,2,true),
+            new BeltDisplayInfo(BeltE2S,OneInOutRight,3,true),
+            new BeltDisplayInfo(BeltS2W,OneInOutRight,0,true),
 
             // 1 in, 2 out ( 12 total )
             new BeltDisplayInfo(BeltW2NS,OneInTwoOutTee,0,false),

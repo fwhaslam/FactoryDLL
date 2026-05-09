@@ -18,3 +18,7 @@ create tile image for  the 50 belt types
 DLL logic so belt connections link up to nearby entry/exit points.
 
 finish a sample rule set, create model representation of rule set
+
+Replace FacilityTypeInfo logic with tables ( instead of introspection )
+
+Break Facility class into class tree: BeltFacility, MakeFacility, EditFacility,VendFacility.

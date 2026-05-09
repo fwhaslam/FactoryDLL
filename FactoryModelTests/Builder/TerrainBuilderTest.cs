@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using FactoryModel.Builder;
 
-using static FactoryModel.Models.Enums.TileTypeEnum;
+using static FactoryModel.Models.Constants.TileTypeEnum;
 
 namespace FactoryModelTests.Builder {
 
@@ -22,7 +22,9 @@ namespace FactoryModelTests.Builder {
         [TestMethod]
         public void Builder() {
 
-            var builder = new TerrainBuilder();
+            var builder = new TerrainBuilder() {
+                Rand = new Random( 12345 )
+            };
             builder.Size = 20;
 
             // invocation
@@ -42,7 +44,9 @@ namespace FactoryModelTests.Builder {
             var limit = size-1;
             var half = size / 2;
 
-            var builder = new TerrainBuilder();
+            var builder = new TerrainBuilder() {
+                Rand = new Random( 12345 )
+            };
             builder.Size = size;
 
             // invocation

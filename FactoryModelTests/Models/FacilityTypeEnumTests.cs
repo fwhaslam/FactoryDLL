@@ -13,9 +13,9 @@ using System.Text;
 using FactoryModel.Builder;
 
 using System.Collections.Generic;
-using static FactoryModel.Models.Enums.FacilityTypeEnum;
-using static FactoryModel.Models.Enums.FacilityTypeInfo;
-using FactoryModel.Models.Enums;
+using static FactoryModel.Models.Constants.FacilityTypeEnum;
+using static FactoryModel.Models.Constants.FacilityTypeInfo;
+using FactoryModel.Models.Constants;
 
 namespace FactoryModelTests.Models {
 
@@ -78,16 +78,16 @@ namespace FactoryModelTests.Models {
                             if (iNum>0 && oNum>0) {
 
                                 name = "Belt";
-                                if (nx==OUT_LINK) name += "N";
-                                if (sx==OUT_LINK) name += "S";
-                                if (ex==OUT_LINK) name += "E";
-                                if (wx==OUT_LINK) name += "W";
-
-                                name += "2";
                                 if (nx==IN_LINK) name += "N";
                                 if (sx==IN_LINK) name += "S";
                                 if (ex==IN_LINK) name += "E";
                                 if (wx==IN_LINK) name += "W";
+
+                                name += "2";
+                                if (nx==OUT_LINK) name += "N";
+                                if (sx==OUT_LINK) name += "S";
+                                if (ex==OUT_LINK) name += "E";
+                                if (wx==OUT_LINK) name += "W";
 
                                 forms.Add( new FormInfo {
                                     Name = name,
@@ -104,21 +104,21 @@ namespace FactoryModelTests.Models {
 
             // replace 'empty' values with more useful defaults
             // no ins + no outs
-            defaultBelt[NO_LINK,NO_LINK,NO_LINK,NO_LINK] = "BeltN2S";
+            defaultBelt[NO_LINK,NO_LINK,NO_LINK,NO_LINK] = "BeltS2N";   // see: DEFAULT_BELT_ENUM
 
             // no outs
-            defaultBelt[IN_LINK,IN_LINK,IN_LINK,IN_LINK] = "BeltN2S";
+            defaultBelt[IN_LINK,IN_LINK,IN_LINK,IN_LINK] = "BeltS2N";
 
             defaultBelt[IN_LINK,NO_LINK,NO_LINK,NO_LINK] = "BeltN2S";
             defaultBelt[NO_LINK,IN_LINK,NO_LINK,NO_LINK] = "BeltS2N";
             defaultBelt[NO_LINK,NO_LINK,IN_LINK,NO_LINK] = "BeltE2W";
             defaultBelt[NO_LINK,NO_LINK,NO_LINK,IN_LINK] = "BeltW2E";
 
-            defaultBelt[IN_LINK,IN_LINK,NO_LINK,NO_LINK] = "BeltNS2W";
-            defaultBelt[NO_LINK,IN_LINK,IN_LINK,NO_LINK] = "BeltSE2W";
-            defaultBelt[NO_LINK,NO_LINK,IN_LINK,IN_LINK] = "BeltEW2S";
-            defaultBelt[IN_LINK,NO_LINK,NO_LINK,IN_LINK] = "BeltNW2E";
+            defaultBelt[IN_LINK,IN_LINK,NO_LINK,NO_LINK] = "BeltNS2E";
+            defaultBelt[NO_LINK,NO_LINK,IN_LINK,IN_LINK] = "BeltEW2N";
 
+            defaultBelt[NO_LINK,IN_LINK,IN_LINK,NO_LINK] = "BeltSE2W";
+            defaultBelt[IN_LINK,NO_LINK,NO_LINK,IN_LINK] = "BeltNW2E";
             defaultBelt[IN_LINK,NO_LINK,IN_LINK,NO_LINK] = "BeltNE2S";
             defaultBelt[NO_LINK,IN_LINK,NO_LINK,IN_LINK] = "BeltSW2N";
 
@@ -128,18 +128,18 @@ namespace FactoryModelTests.Models {
             defaultBelt[IN_LINK,IN_LINK,NO_LINK,IN_LINK] = "BeltNSW2E";
 
             // no ins
-            defaultBelt[OUT_LINK,OUT_LINK,OUT_LINK,OUT_LINK] = "BeltN2S";
+            defaultBelt[OUT_LINK,OUT_LINK,OUT_LINK,OUT_LINK] = "BeltS2N";
 
             defaultBelt[OUT_LINK,NO_LINK,NO_LINK,NO_LINK] = "BeltS2N";
             defaultBelt[NO_LINK,OUT_LINK,NO_LINK,NO_LINK] = "BeltN2S";
             defaultBelt[NO_LINK,NO_LINK,OUT_LINK,NO_LINK] = "BeltW2E";
             defaultBelt[NO_LINK,NO_LINK,NO_LINK,OUT_LINK] = "BeltE2W";
 
-            defaultBelt[OUT_LINK,OUT_LINK,NO_LINK,NO_LINK] = "BeltE2NS";
-            defaultBelt[NO_LINK,OUT_LINK,OUT_LINK,NO_LINK] = "BeltN2SE";
-            defaultBelt[NO_LINK,NO_LINK,OUT_LINK,OUT_LINK] = "BeltN2EW";
-            defaultBelt[OUT_LINK,NO_LINK,NO_LINK,OUT_LINK] = "BeltS2NW";
+            defaultBelt[OUT_LINK,OUT_LINK,NO_LINK,NO_LINK] = "BeltW2NS";
+            defaultBelt[NO_LINK,NO_LINK,OUT_LINK,OUT_LINK] = "BeltS2EW";
 
+            defaultBelt[NO_LINK,OUT_LINK,OUT_LINK,NO_LINK] = "BeltN2SE";
+            defaultBelt[OUT_LINK,NO_LINK,NO_LINK,OUT_LINK] = "BeltS2NW";
             defaultBelt[OUT_LINK,NO_LINK,OUT_LINK,NO_LINK] = "BeltW2NE";
             defaultBelt[NO_LINK,OUT_LINK,NO_LINK,OUT_LINK] = "BeltE2SW";
 
@@ -164,10 +164,10 @@ namespace FactoryModelTests.Models {
 
             Console.WriteLine("Valid="+valid);
             Console.WriteLine(show);
-            Console.WriteLine("\n\nDirectionArray:\n"+DeafultBeltAsCodeString(defaultBelt) );
+            Console.WriteLine("\n\nDirectionArray:\n"+DefaultBeltAsCodeString(defaultBelt) );
         }
 
-        internal string DeafultBeltAsCodeString(string[,,,] defaultBelt) {
+        internal string DefaultBeltAsCodeString(string[,,,] defaultBelt) {
 
             var buf = new StringBuilder();
             buf.Append("{\n");
@@ -222,6 +222,19 @@ namespace FactoryModelTests.Models {
             AreEqual( IN_LINK, FacilityTypeInfo.EastLink( BeltNE2W ) ); 
             AreEqual( OUT_LINK, FacilityTypeInfo.EastLink( BeltW2SE ) ); 
             AreEqual( NO_LINK, FacilityTypeInfo.EastLink( BeltN2SW ) ); 
+
+        }
+
+        [TestMethod]
+        public void NorthDir() {
+
+            AreEqual( IN_LINK, FacilityTypeInfo.NorthLink( BeltN2W ) ); 
+            AreEqual( OUT_LINK, FacilityTypeInfo.NorthLink( BeltW2N ) ); 
+            AreEqual( NO_LINK, FacilityTypeInfo.NorthLink( BeltE2S ) ); 
+
+            AreEqual( IN_LINK, FacilityTypeInfo.NorthLink( BeltNE2W ) ); 
+            AreEqual( OUT_LINK, FacilityTypeInfo.NorthLink( BeltW2NS ) ); 
+            AreEqual( NO_LINK, FacilityTypeInfo.NorthLink( BeltS2EW ) ); 
 
         }
     }

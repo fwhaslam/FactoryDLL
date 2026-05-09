@@ -13,8 +13,8 @@ using System.Text;
 using FactoryModel.Builder;
 using FactoryModel.Models;
 
-using static FactoryModel.Models.Enums.TileTypeEnum;
-using static FactoryModel.Models.Enums.FacilityTypeEnum;
+using static FactoryModel.Models.Constants.TileTypeEnum;
+using static FactoryModel.Models.Constants.FacilityTypeEnum;
 
 
 namespace FactoryModelTests.Builder {
@@ -55,11 +55,16 @@ namespace FactoryModelTests.Builder {
             AreEqual( 0, mgr.Plan.Count );
 
             // invoke
-            var results = mgr.SubmitToPlan( loc1, BeltN2S );
+            var results = mgr.SubmitBeltToPlan( loc1 );
+
+            // assertions
             AreEqual( 1, mgr.Plan.Count );
             IsNotNull(mgr.Plan[loc1]);
             AreEqual( 1, results.Count );
             AreEqual( loc1, results[0] );
+            
+            AreEqual( 1, mgr.Plan.Count );
+            AreEqual( BeltS2N, mgr.Plan[loc1].Facility );
 
             // invoke
             mgr.CancelChange();
@@ -68,56 +73,107 @@ namespace FactoryModelTests.Builder {
         }
 
         [TestMethod]
-        public void AddTwoForceLink() { 
+        public void AddTwoInARow() { 
 
             var mgr = SimpleManager();
             mgr.StartChange();
 
             var loc1 = new Where(2,2);
-            var loc2 = new Where(3,2);
+            var loc2 = new Where(3,2);  // step East
 
             // invoke
-            var ignored = mgr.SubmitToPlan( loc1, BeltN2S );
-            var results = mgr.SubmitToPlan( loc2, BeltN2S );
+            mgr.SubmitBeltToPlan( loc1 );
+            var results = mgr.SubmitBeltToPlan( loc2 );
 
             // asertions
-            AreEqual( 2, mgr.Plan.Count );
-            AreEqual( BeltW2E, mgr.Plan[loc1].Facility );
-            AreEqual( BeltW2E, mgr.Plan[loc2].Facility );
-
             AreEqual( 2, results.Count );
             AreEqual( loc2, results[0] );
             AreEqual( loc1, results[1] );
+
+            AreEqual( 2, mgr.Plan.Count );
+            AreEqual( BeltW2E, mgr.Plan[loc1].Facility );
+            AreEqual( BeltW2E, mgr.Plan[loc2].Facility );
+        }
+
+        [TestMethod]
+        public void AddThreeInARow() { 
+
+            var mgr = SimpleManager();
+            mgr.StartChange();
+
+            var loc1 = new Where(1,2);
+            var loc2 = new Where(2,2);  // step East
+            var loc3 = new Where(3,2);  // step East
+
+            // invoke
+            mgr.SubmitBeltToPlan( loc1 );
+            mgr.SubmitBeltToPlan( loc2 );
+            var results = mgr.SubmitBeltToPlan( loc3 );
+
+            // asertions
+            AreEqual( 2, results.Count );
+            AreEqual( loc3, results[0] );
+            AreEqual( loc2, results[1] );
+
+            AreEqual( 3, mgr.Plan.Count );
+            AreEqual( BeltW2E, mgr.Plan[loc1].Facility );
+            AreEqual( BeltW2E, mgr.Plan[loc2].Facility );
+            AreEqual( BeltW2E, mgr.Plan[loc3].Facility );
         }
 
         [TestMethod]
         public void AddThreeInALoop() { 
 
+            var mgr = SimpleManager();
+            mgr.StartChange();
+
+            var loc1 = new Where(2,2);
+            var loc2 = new Where(3,2);  // step East
+            var loc3 = new Where(3,3);  // step North
+
+            // invoke
+            mgr.SubmitBeltToPlan( loc1 );
+            mgr.SubmitBeltToPlan( loc2 );
+            var results = mgr.SubmitBeltToPlan( loc3 );
+
+            // asertions
+            AreEqual( 2, results.Count );
+            AreEqual( loc3, results[0] );
+            AreEqual( loc2, results[1] );
+
+            AreEqual( 3, mgr.Plan.Count );
+            AreEqual( BeltW2E, mgr.Plan[loc1].Facility );
+            AreEqual( BeltW2N, mgr.Plan[loc2].Facility );
+            AreEqual( BeltS2N, mgr.Plan[loc3].Facility );
+        }
+
+        [TestMethod]
+        public void AddFourInALoop() { 
 
             var mgr = SimpleManager();
             mgr.StartChange();
 
             var loc1 = new Where(2,2);
-            var loc2 = new Where(3,2);
-            var loc3 = new Where(3,3);
-            //var loc4 = new Where(2,3);
+            var loc2 = new Where(3,2);  // step East
+            var loc3 = new Where(3,3);  // step North
+            var loc4 = new Where(2,3);  // step West
 
             // invoke
-            mgr.SubmitToPlan( loc1, BeltN2S );
-            mgr.SubmitToPlan( loc2, BeltN2S );
-            var results = mgr.SubmitToPlan( loc3, BeltN2S );
-            //mgr.SubmitToPlan( loc4, BeltN2S );
+            mgr.SubmitBeltToPlan( loc1 );
+            mgr.SubmitBeltToPlan( loc2 );
+            mgr.SubmitBeltToPlan( loc3 );
+            var results = mgr.SubmitBeltToPlan( loc4 );
 
             // asertions
-            AreEqual( 3, mgr.Plan.Count );
-            AreEqual( BeltS2E, mgr.Plan[loc1].Facility ); // W2E
-            AreEqual( BeltW2S, mgr.Plan[loc2].Facility );   // W2E
-            AreEqual( BeltN2W, mgr.Plan[loc3].Facility );   // E2W
-            //AreEqual( BeltE2N, mgr.Plan[loc4].Facility );   // E2W
-
             AreEqual( 2, results.Count );
-            AreEqual( loc3, results[0] );
-            AreEqual( loc2, results[1] );
+            AreEqual( loc4, results[0] );
+            AreEqual( loc3, results[1] );
+
+            AreEqual( 4, mgr.Plan.Count );
+            AreEqual( BeltW2E, mgr.Plan[loc1].Facility );
+            AreEqual( BeltW2N, mgr.Plan[loc2].Facility );
+            AreEqual( BeltS2W, mgr.Plan[loc3].Facility );   // E2W
+            AreEqual( BeltE2W, mgr.Plan[loc4].Facility );   // E2W
         }
     }
 }
