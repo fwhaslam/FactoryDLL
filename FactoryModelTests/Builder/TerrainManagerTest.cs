@@ -13,14 +13,21 @@ using System.Text;
 using FactoryModel.Builder;
 using FactoryModel.Models;
 
-using static FactoryModel.Models.Constants.TileTypeEnum;
-using static FactoryModel.Models.Constants.FacilityTypeEnum;
+using static FactoryModel.Models.Constants.TileType;
+using static FactoryModel.Models.Constants.SiteType;
+using FactoryModel.Models.Sites;
+using FactoryModel.Models.Constants;
 
 
 namespace FactoryModelTests.Builder {
 
+
     [TestClass]
     public class TerrainManagerTest {
+
+        //internal static FacilityTypeEnum GetBeltType( Facility facility ) {
+        //   return facility.Type;
+        //}
 
         internal Terrain SimpleMap() {
 
@@ -39,8 +46,8 @@ namespace FactoryModelTests.Builder {
             return map;
         }
 
-        internal TerrainManager SimpleManager() {
-            return new TerrainManager() { Map = SimpleMap() };
+        internal BeltSiteManager SimpleManager() {
+            return new BeltSiteManager() { Map = SimpleMap() };
         }
 
         [TestMethod]
@@ -64,7 +71,7 @@ namespace FactoryModelTests.Builder {
             AreEqual( loc1, results[0] );
             
             AreEqual( 1, mgr.Plan.Count );
-            AreEqual( BeltS2N, mgr.Plan[loc1].Facility );
+            AreEqual( BeltS2N, mgr.Plan[loc1].Site.Type );
 
             // invoke
             mgr.CancelChange();
@@ -91,8 +98,8 @@ namespace FactoryModelTests.Builder {
             AreEqual( loc1, results[1] );
 
             AreEqual( 2, mgr.Plan.Count );
-            AreEqual( BeltW2E, mgr.Plan[loc1].Facility );
-            AreEqual( BeltW2E, mgr.Plan[loc2].Facility );
+            AreEqual( BeltW2E, mgr.Plan[loc1].Site.Type);
+            AreEqual( BeltW2E, mgr.Plan[loc2].Site.Type);
         }
 
         [TestMethod]
@@ -116,9 +123,9 @@ namespace FactoryModelTests.Builder {
             AreEqual( loc2, results[1] );
 
             AreEqual( 3, mgr.Plan.Count );
-            AreEqual( BeltW2E, mgr.Plan[loc1].Facility );
-            AreEqual( BeltW2E, mgr.Plan[loc2].Facility );
-            AreEqual( BeltW2E, mgr.Plan[loc3].Facility );
+            AreEqual( BeltW2E, mgr.Plan[loc1].Site.Type);
+            AreEqual( BeltW2E, mgr.Plan[loc2].Site.Type);
+            AreEqual( BeltW2E, mgr.Plan[loc3].Site.Type);
         }
 
         [TestMethod]
@@ -142,9 +149,9 @@ namespace FactoryModelTests.Builder {
             AreEqual( loc2, results[1] );
 
             AreEqual( 3, mgr.Plan.Count );
-            AreEqual( BeltW2E, mgr.Plan[loc1].Facility );
-            AreEqual( BeltW2N, mgr.Plan[loc2].Facility );
-            AreEqual( BeltS2N, mgr.Plan[loc3].Facility );
+            AreEqual( BeltW2E, mgr.Plan[loc1].Site.Type);
+            AreEqual( BeltW2N, mgr.Plan[loc2].Site.Type);
+            AreEqual( BeltS2N, mgr.Plan[loc3].Site.Type);
         }
 
         [TestMethod]
@@ -170,10 +177,10 @@ namespace FactoryModelTests.Builder {
             AreEqual( loc3, results[1] );
 
             AreEqual( 4, mgr.Plan.Count );
-            AreEqual( BeltW2E, mgr.Plan[loc1].Facility );
-            AreEqual( BeltW2N, mgr.Plan[loc2].Facility );
-            AreEqual( BeltS2W, mgr.Plan[loc3].Facility );   // E2W
-            AreEqual( BeltE2W, mgr.Plan[loc4].Facility );   // E2W
+            AreEqual( BeltW2E, mgr.Plan[loc1].Site.Type);
+            AreEqual( BeltW2N, mgr.Plan[loc2].Site.Type);
+            AreEqual( BeltS2W, mgr.Plan[loc3].Site.Type);   // E2W
+            AreEqual( BeltE2W, mgr.Plan[loc4].Site.Type);   // E2W
         }
     }
 }

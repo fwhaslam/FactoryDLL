@@ -21,7 +21,11 @@ namespace FactoryModel.Models {
             Y = y;
         }
 
-        public string ToDisplay() { return "Where("+X+"/"+Y+")"; }
+        public string ToDisplay( bool header = true ) { 
+            var display = "x="+X+",y="+Y;
+            if (!header) return display;
+            return "Where("+display+")";
+        }
 
         public int X {  get; set; }
 
@@ -35,6 +39,23 @@ namespace FactoryModel.Models {
             return new Where( X-sub.X, Y-sub.Y );
         }
 
+        public int Distance( Where to ) {
+            return (int)( 0.5f + Math.Sqrt( Distance2(to) ) );
+        }
+        public int Distance2( Where to ) {
+            var diff = Minus(to);
+            return diff.X*diff.X + diff.Y*diff.Y;
+        }
+
+        public bool IsClose( Where to, int limit ) {
+            return IsClose2( to, limit*limit );
+        }
+
+        public bool IsClose2( Where to, int limit2 ) {
+            var dist2 = Distance2( to );
+            return ( dist2 < limit2 );
+        }
+
         public override bool Equals(object obj) {
             return Equals(obj as Where);
         }
@@ -45,8 +66,12 @@ namespace FactoryModel.Models {
                    Y == other.Y;
         }
 
+        /// <summary>
+        /// Suitable for THIS GAME.  We do not plan to make maps greater than 10k on a side.
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode() {
-            return X*10000+Y;
+            return (X*10000) + Y;
         }
 
         public int CompareTo(Where other) {

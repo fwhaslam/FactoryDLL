@@ -6,9 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using FactoryModel.Models;
 using FactoryModel.Models.Constants;
-using static FactoryModel.Models.RuleType;
+
+using static FactoryModel.Models.Constants.RuleType;
+using static FactoryModel.Models.Constants.SiteTypeInfo;
+using FactoryModel.Tools;
+
 
 namespace FactoryModel.Builder {
 
@@ -17,52 +22,95 @@ namespace FactoryModel.Builder {
     /// </summary>
     public class MarketBuilder {
 
-        public Random Rand { get; set; } = new Random( Environment.TickCount );
+        public RandTool Rand { get; set; } = new RandTool( Environment.TickCount );
 
-        public int Size {  get; set; }
+        public int Limit {  get; set; }
 
-        public Market Market { get; set; }
+        public Market Trade { get; set; }
 
+
+        /// <summary>
+        /// add new chains up to limit, with restrictions on lower tier count.
+        /// </summary>
         public void Build() { 
             
-            Market = new Market();
+            Trade = new Market();
 
-            Market.AddChain( InventChain( 1 ) );
-            Market.AddChain( InventChain( 2 ) );
-            Market.AddChain( InventChain( 3 ) );
-            Market.AddChain( InventChain( 4 ) );
-            Market.AddChain( InventChain( 5 ) );
-            Market.AddChain( InventChain( 6 ) );
+            // build chains based on tier count
+            var tierMap = SelectNumberOfTiers();
+//Console.WriteLine("TierMap="+tierMap);
 
-        }
-
-        internal Product NextProduct( int tier ) {
-            var num = 1 + Market.Products.Count;
-            var work = new Product() {
-                Name = "P"+num,
-                Value = tier * (1+tier) / 2     // triangle value
-            };
-            Market.Products.Add( work );
-            return work;
-        }
-
-        internal Product PickProduct() {
-            if (Market.Products.Count<1) return null;
-            var pick = Rand.Next( Market.Products.Count() );
-            return Market.Products[ pick ];
-        }
-
-        internal int PickLength( int tier ) {
-            return PickLength( tier, (float)Rand.NextDouble() );
-        }
-
-        internal static int PickLength( int tier, float value ) {
-            var info = TierInfo.TierMap[tier];
-            for (int ix=0; ix<info.ChainLength.Count(); ix++) { 
-                if ( value<info.ChainLength[ix] ) return ix;
+            for ( int tier=1;tier<=MAXIMUM_TIER_LIMIT;tier++) {
+                if (tierMap.ContainsKey(tier)) {
+//Console.WriteLine("TierMap["+tier+"] = " + tierMap[tier]);
+                    var count = tierMap[tier];
+                    for ( int cx = 0; cx<count; cx++ ) {
+                        var chain = InventChain( tier );
+                        Trade.AddChain( chain );
+                    }
+                }
             }
-            return -1;  // we should not reach this line, providing ChainLength[] is correct
         }
+
+
+        /// <summary>
+        /// Decide on how many chains for each tier.
+        /// </summary>
+        /// <returns>Map[Tiers,Count]</returns>
+        internal Dictionary<int,int> SelectNumberOfTiers() {
+
+            var map = new Dictionary<int,int>();
+
+            var halfLimit = (1+Limit)/2;
+            if (halfLimit>MAXIMUM_TIER_LIMIT) halfLimit = MAXIMUM_TIER_LIMIT;
+
+            // ensure we have 1 per tier up to halfLimit
+            for ( int tx=1; tx<=halfLimit; tx++ ) {
+                map[tx] = 1;
+            }
+            
+            // pick some more at random, creating random mix.
+            for ( int cx=halfLimit; cx<Limit; cx++) {
+                var newTierSpace = FindChainSpace( map );
+                var addTier = newTierSpace[ Rand.Next(newTierSpace.Count) ];
+                if (!map.ContainsKey(addTier)) map[addTier] = 0;
+                map[addTier]++;
+            }
+
+            return map;
+        }
+
+        /// <summary>
+        /// List of Tiers that may be added to market.
+        /// 
+        /// No more than half(limit) for a particular tier.
+        /// Must have Tier N before Tier N+1.  
+        /// Assume Tier 0 exists.
+        /// </summary>
+        /// <returns></returns>
+        internal List<int> FindChainSpace( Dictionary<int,int> tierMap ) {
+
+            var maxTier = 0;
+
+            var space = new List<int>();
+            foreach ( var entry in tierMap ) {
+
+                var tier = entry.Key;
+                var count = entry.Value;
+
+                if (2*count>Limit) continue;
+
+                space.Add( tier );
+                if (tier>maxTier) maxTier = tier;
+
+            }
+
+            // add max+1 tier
+            if (maxTier<MAXIMUM_TIER_LIMIT) space.Add( 1+maxTier );
+            return space;
+        }
+
+//======================================================================================================================
 
         internal Chain InventChain( int tier ) {
 
@@ -76,12 +124,12 @@ namespace FactoryModel.Builder {
             // series of transforms
             for (int rx=0;rx<length;rx++) {
                 
-                lastProduct = work.Last.Out.Key(0);
+                lastProduct = work.LastRule.Out.Key(0);
                 work.Add( InventEditRule( tier, lastProduct ) );
             }
 
             // chain endpoint
-            lastProduct = work.Last.Out.Key(0);
+            lastProduct = work.LastRule.Out.Key(0);
             work.Add( InventVendRule( tier, lastProduct ) );
 
             return work;
@@ -153,6 +201,36 @@ namespace FactoryModel.Builder {
             // cleanup
             rule.Out.Key(0).Value = value;
             return rule;
+        }
+
+
+        internal Product NextProduct( int tier ) {
+            var num = 1 + Trade.Products.Count;
+            var work = new Product() {
+                Name = "P"+num,
+                Value = tier * (1+tier) / 2     // triangle value
+            };
+            Trade.Products.Add( work );
+            return work;
+        }
+
+        internal Product PickProduct() {
+            if (Trade.Products.Count<1) return null;
+            var pick = Rand.Next( Trade.Products.Count() );
+            return Trade.Products[ pick ];
+        }
+
+        internal int PickLength( int tier ) {
+            return PickLength( tier, (float)Rand.NextDouble() );
+        }
+
+        internal static int PickLength( int tier, float value ) {
+//Console.WriteLine("PICK LENGTH["+tier+"] ="+value);
+            var info = TierInfo.TierMap[tier];
+            for (int ix=0; ix<info.ChainLength.Count(); ix++) { 
+                if ( value<info.ChainLength[ix] ) return ix;
+            }
+            return -1;  // we should not reach this line, providing ChainLength[] is correct
         }
 
 

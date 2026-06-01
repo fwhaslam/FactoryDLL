@@ -3,9 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FactoryModel.Models {
 
@@ -14,8 +11,10 @@ namespace FactoryModel.Models {
     /// </summary>
     public class Chain : List<Rule> {
 
-        public Rule First { get {  return this[0]; } }
+        public int Tier { get { return FirstRule.Tier; } }
 
-        public Rule Last { get {  return this[ Count-1 ]; } }
+        public Rule FirstRule { get {  return this[0]; } }
+
+        public Rule LastRule { get {  return this[ Count-1 ]; } }
     }
 }

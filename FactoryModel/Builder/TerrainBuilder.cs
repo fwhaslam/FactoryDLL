@@ -11,7 +11,8 @@ using System.Text;
 using System.Threading.Tasks;
 using FactoryModel.Models;
 using FactoryModel.Models.Constants;
-using static FactoryModel.Models.Constants.TileTypeEnum;
+using FactoryModel.Tools;
+using static FactoryModel.Models.Constants.TileType;
 
 namespace FactoryModel.Builder {
 
@@ -23,7 +24,7 @@ namespace FactoryModel.Builder {
         // multiple of base height, to create more interesting bumps.
         internal static readonly int HEIGHT_MULT = 3;
 
-        public Random Rand { get; set; } = new Random( Environment.TickCount );
+        public RandTool Rand { get; set; } = new RandTool( Environment.TickCount );
 
         public int Size {  get; set; }
 
@@ -31,27 +32,23 @@ namespace FactoryModel.Builder {
 
         public void Build() { 
 
-            BuildBaseTiles( Size, Size, Plains );
-
-            LayDownSomeRandomSplashes();
-
-            CutTheCorners();
-
-            SwapTileSmoothing();
-
-            FixHeights();
-
-            FixAdjacentHeights();
-
-        }
-
-        internal void BuildBaseTiles( int wide,int tall, TileTypeEnum type ) { 
-
             Map = new Terrain() {
                 Wide = Size,
                 Tall = Size,
                 Grid = new Tile[Size,Size]
             };
+
+            BuildBaseTiles( Size, Size, Plains );
+
+            LayDownSomeRandomSplashes();
+            CutTheCorners();
+            SwapTileSmoothing();
+            FixHeightsByType();
+
+        }
+
+        internal void BuildBaseTiles( int wide,int tall, TileType type ) { 
+
  
             // fill with plains
             var height = TileTypeInfo.InfoMap[Plains].BaseHeight;
@@ -67,12 +64,12 @@ namespace FactoryModel.Builder {
 
         internal void LayDownSomeRandomSplashes() { 
 
-            var start = Size / 3;
+            var start = Size / 2;
 
             for ( int radius=start;radius>1;radius--) {
 
                 var type = Rand.Next(0,TileTypeInfo.TileTypeEnumCount);
-                SplashColor( (TileTypeEnum)type, radius );
+                SplashColor( (TileType)type, radius );
             }
 
         }
@@ -109,7 +106,7 @@ namespace FactoryModel.Builder {
         }
 
 
-        internal void SplashColor( TileTypeEnum type, int radius ) {
+        internal void SplashColor( TileType type, int radius ) {
 
             var height = TileTypeInfo.InfoMap[type].BaseHeight;
 
@@ -143,62 +140,24 @@ namespace FactoryModel.Builder {
 
 //======================================================================================================================
 
-        internal void FixHeights() {
+        internal Dictionary<TileType, int> TileTypeHeight = new Dictionary<TileType, int>() { 
+            { Sea, 0 },
+            { Swamp, 3 },
+            { Dunes, 3 },
+            { Plains, 4 },
+            { Woods, 4 },
+            { Forest, 5 },
+            { Hills, 5 },
+            { Peaks, 8 },
+        };
 
+        internal void FixHeightsByType() {
             for (int ix=0;ix<Map.Wide;ix++) {
                 for (int iy=0;iy<Map.Tall;iy++) {
                     var work = Map.Grid[ix,iy];
-                    work.Height = TileTypeInfo.InfoMap[ work.Type ].BaseHeight * HEIGHT_MULT;
+                    work.Height = TileTypeHeight[work.Type];
                 }
             }
-        }
-
-        /// <summary>
-        /// Over multiple passes, reduce height to lowest neighbor +1.
-        /// </summary>
-        internal void FixAdjacentHeights() {
-
-            //int countdownToDitch = 1;
-
-            var more = true;
-            while (more) {
-
-                more = false;
-                for (int ix=0;ix<Map.Wide;ix++) {
-                    for (int iy=0;iy<Map.Tall;iy++) {
-
-                        // skip sea tiles
-                        var work = Map.Grid[ix,iy];
-                        if (work.Type==Sea) continue;
-
-                        // is anyone lower?
-                        var minHeight = LowestNeighborHeight( work );
-                        if (minHeight >= work.Height-1 ) continue;
-
-                        // lower height
-                        work.Height--;
-                        more = true;
-//Console.WriteLine( $"AT {ix:f3} / {iy:f3} Height = {work.Height:#}" );
-
-                    }
-                }
-
-                //countdownToDitch--;
-
-                //if (countdownToDitch<0) break;
-            }
-        }
-
-        internal int LowestNeighborHeight( Tile pick ) {
-
-            var min = pick.Height;
-
-            min = Math.Min( min, GetBuddy( pick, 0, +1 ).Height );
-            min = Math.Min( min, GetBuddy( pick, 0, -1 ).Height );
-            min = Math.Min( min, GetBuddy( pick, -1, 0 ).Height );
-            min = Math.Min( min, GetBuddy( pick, +1, 0 ).Height );
-
-            return min;
         }
 
 //======================================================================================================================
@@ -284,6 +243,7 @@ namespace FactoryModel.Builder {
             }
             return DEFAULT_BUDDY;
         }
+
     }
 
 }

@@ -8,29 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using FactoryModel.Tools;
 
-using static FactoryModel.Models.Constants.MakeTypeEnum;
-using static FactoryModel.Models.Constants.VendTypeEnum;
 using static FactoryModel.Models.Constants.EditTypeEnum;
-using static FactoryModel.Models.Constants.FacilityTypeEnum;
+using static FactoryModel.Models.Constants.SiteType;
 
 using static FactoryModel.Tools.SystemTools;
 using FactoryModel.Models.Constants;
 
 namespace FactoryModel.Models.Constants {
 
-    public enum MakeTypeEnum {
-        SimpleMake, // Picker
-        FairMake,   // Cutter
-        GoodMake,   // Grabber
-        GreatMake,  // Ripper
-    }
-
-    public enum VendTypeEnum {
-        SimpleVend, // Beggar
-        FairVend,   // Hawker
-        GoodVend,   // Pedlar
-        GreatVend,  // Vendor
-    }
 
     /// <summary>
     /// Transformer Inputs versus Outputs.
@@ -57,7 +42,7 @@ namespace FactoryModel.Models.Constants {
 
         public EditTypeEnum Key {  get {  return Type; } }
 
-        public List<FacilityTypeEnum> Facilities { get; set; } = new List<FacilityTypeEnum>();
+        public List<SiteType> Facilities { get; set; } = new List<SiteType>();
 
         public int Inputs { get; set; } = 1;
 
@@ -67,62 +52,62 @@ namespace FactoryModel.Models.Constants {
         public static readonly List<EditTypeEnumInfo> EditTypeEnumList = new List<EditTypeEnumInfo> {
             new EditTypeEnumInfo() {
                 Type = OneVOne,
-                Facilities = new List<FacilityTypeEnum>(){ EditOneVOne }
+                Facilities = new List<SiteType>(){ EditOneVOne }
             },
             new EditTypeEnumInfo() {
                 Type = OneVTwo,
                 Outputs = 2,
-                Facilities = new List<FacilityTypeEnum>(){ EditOneVTwo }
+                Facilities = new List<SiteType>(){ EditOneVTwo }
             },
             new EditTypeEnumInfo() {
                 Type = TwoVOne,
                 Inputs = 2,
-                Facilities = new List<FacilityTypeEnum>(){ EditTwoVOne }
+                Facilities = new List<SiteType>(){ EditTwoVOne }
             },
             new EditTypeEnumInfo() {
                 Type = TwoVTwo,
                 Inputs = 2,
-                Facilities = new List<FacilityTypeEnum>(){ EditTwoVTwo }
+                Facilities = new List<SiteType>(){ EditTwoVTwo }
 
             },
             new EditTypeEnumInfo() {
                 Type = ThreeVOne,
                 Inputs = 3,
-                Facilities = new List<FacilityTypeEnum>(){ EditThreeVOne }
+                Facilities = new List<SiteType>(){ EditThreeVOne }
             },
             new EditTypeEnumInfo() {
                 Type = ThreeVTwo,
                 Inputs = 3,
                 Outputs = 2,
-                Facilities = new List<FacilityTypeEnum>(){ EditThreeVTwo }
+                Facilities = new List<SiteType>(){ EditThreeVTwo }
             },
             new EditTypeEnumInfo() {
                 Type = ThreeVThree,
                 Inputs = 3,
                 Outputs = 3,
-                Facilities = new List<FacilityTypeEnum>(){ EditThreeVThree }
+                Facilities = new List<SiteType>(){ EditThreeVThree }
             },
             new EditTypeEnumInfo() {
                 Type = FiveVOne,
                 Inputs = 5,
-                Facilities = new List<FacilityTypeEnum>(){ EditFiveVOne }
+                Facilities = new List<SiteType>(){ EditFiveVOne }
             },
             new EditTypeEnumInfo() {
                 Type = FiveVThree,
                 Inputs = 5,
                 Outputs = 3,
-                Facilities = new List<FacilityTypeEnum>(){ EditFiveVThree }
+                Facilities = new List<SiteType>(){ EditFiveVThree }
             },
             new EditTypeEnumInfo() {
                 Type = EightVOne,
                 Inputs = 8,
-                Facilities = new List<FacilityTypeEnum>(){ EditEightVOne }
+                Facilities = new List<SiteType>(){ EditEightVOne }
             },
             new EditTypeEnumInfo() {
                 Type = EightVThree,
                 Inputs = 8,
                 Outputs = 3,
-                Facilities = new List<FacilityTypeEnum>(){ EditEightVThree }
+                Facilities = new List<SiteType>(){ EditEightVThree }
             }
         };
 
@@ -157,9 +142,9 @@ namespace FactoryModel.Models.Constants {
 
         public int FacilityCost { get; set; } = 10;
 
-        public List<MakeTypeEnum> Makers { get; set; } = new List<MakeTypeEnum>();
+        public List<SiteType> Makers { get; set; } = new List<SiteType>();
 
-        public List<VendTypeEnum> Venders { get; set; } = new List<VendTypeEnum>();
+        public List<SiteType> Venders { get; set; } = new List<SiteType>();
 
         public List<EditTypeEnum> Editors { get; set; } = new List<EditTypeEnum>();
 
@@ -188,58 +173,58 @@ namespace FactoryModel.Models.Constants {
             new TierInfo() {
                 Tier = 1,
                 FacilityCost = 10,
-                Makers = AsEnumList<MakeTypeEnum>( 0 ),
-                Venders = AsEnumList<VendTypeEnum>( 0 ),
+                Makers = AsEnumList<SiteType>( 0 ),
+                Venders = AsEnumList<SiteType>( 0 ),
                 Editors = AsEnumList<EditTypeEnum>( 0 ),
-                ChainLength = new List<float>(){ 0.5f, 0.75f, 0.95f, 1f }
+                ChainLength = new List<float>(){ 0.3f, 0.80f, 1f }
             },
             new TierInfo() {
                 Tier = 2,
                 FacilityCost = 30,
-                Makers = AsEnumList<MakeTypeEnum>( 0 ),
-                Venders = AsEnumList<VendTypeEnum>( 0 ),
+                Makers = AsEnumList<SiteType>( 0 ),
+                Venders = AsEnumList<SiteType>( 0 ),
                 Editors = AsEnumList<EditTypeEnum>( 0, 1 ),
-                ChainLength = new List<float>(){ 0.1f, 0.45f, 0.8f, 0.95f, 1f }
+                ChainLength = new List<float>(){ 0.1f, 0.40f, 0.8f, 1f }
 
             },
             new TierInfo() {
                 Tier = 3,
                 FacilityCost = 100,
-                Makers = AsEnumList<MakeTypeEnum>( 0, 1 ),
-                Venders = AsEnumList<VendTypeEnum>( 0 ),
+                Makers = AsEnumList<SiteType>( 0, 1 ),
+                Venders = AsEnumList<SiteType>( 0 ),
                 Editors = AsEnumList<EditTypeEnum>( 0, 1 ),
                 Filters = AsEnumList<FilterTypeEnum>( 0 ),
-                ChainLength = new List<float>(){ 0f, 0.25f, 0.5f, 0.85f, 0.95f, 1f }
+                ChainLength = new List<float>(){ 0f, 0.25f, 0.5f, 0.75f, 1f }
 
             },
             new TierInfo() {
                 Tier = 4,
                 FacilityCost = 300,
-                Makers = AsEnumList<MakeTypeEnum>( 0, 1 ),
-                Venders = AsEnumList<VendTypeEnum>( 0, 1 ),
+                Makers = AsEnumList<SiteType>( 0, 1 ),
+                Venders = AsEnumList<SiteType>( 0, 1 ),
                 Editors = AsEnumList<EditTypeEnum>( 0, 1, 2 ),
                 Filters = AsEnumList<FilterTypeEnum>( 0, 1 ),
-                ChainLength = new List<float>(){ 0f, 0.25f, 0.5f, 0.75f, 0.9f, 1f }
+                ChainLength = new List<float>(){ 0f, 0.23f, 0.46f, 0.69f, 0.92f, 1f }
 
             },
             new TierInfo() {
                 Tier = 5,
                 FacilityCost = 1000,
-                Makers = AsEnumList<MakeTypeEnum>( 0, 1, 2 ),
-                Venders = AsEnumList<VendTypeEnum>( 0, 1 ),
+                Makers = AsEnumList<SiteType>( 0, 1, 2 ),
+                Venders = AsEnumList<SiteType>( 0, 1 ),
                 Editors = AsEnumList<EditTypeEnum>( 0, 1, 2, 3 ),
                 Filters = AsEnumList<FilterTypeEnum>( 0, 1, 2 ),
-                ChainLength = new List<float>(){ 0f, 0.25f, 0.45f, 0.75f, 0.85f, 0.95f, 1f }
+                ChainLength = new List<float>(){ 0f, 0.21f, 0.42f, 0.63f, 0.84f, 0.92f, 1f }
 
             },
             new TierInfo() {
                 Tier = 6,
                 FacilityCost = 1000,
-                Makers = AsEnumList<MakeTypeEnum>( 0, 1, 2 ),
-                Venders = AsEnumList<VendTypeEnum>( 0, 1, 2 ),
+                Makers = AsEnumList<SiteType>( 0, 1, 2 ),
+                Venders = AsEnumList<SiteType>( 0, 1, 2 ),
                 Editors = AsEnumList<EditTypeEnum>( 0, 1, 2, 3, 4 ),
                 Filters = AsEnumList<FilterTypeEnum>( 0, 1, 2 ),
-                ChainLength = new List<float>(){ 0f, 0.25f, 0.4f, 0.70f, 0.85f, 0.9f, 0.95f, 1f }
+                ChainLength = new List<float>(){ 0f, 0.19f, 0.38f, 0.57f, 0.76f, 0.84f, 0.92f, 1f }
 
             }
         };

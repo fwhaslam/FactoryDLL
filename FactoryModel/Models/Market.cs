@@ -15,10 +15,6 @@ namespace FactoryModel.Models {
     /// 
     /// Markets are directed graphs that may contain cycles under certain restrictions.
     /// 
-    /// There are three node types:
-    /// 1) Entry nodes, which create base products.
-    /// 2) Transform nodes will change the products into different products.
-    /// 3 Exit nodes are endpoints for direction.
     /// </summary>
     public class Market {
 

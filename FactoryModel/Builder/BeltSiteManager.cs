@@ -6,11 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using FactoryModel.Models;
 using FactoryModel.Models.Constants;
+using FactoryModel.Models.Sites;
 
-using static FactoryModel.Models.Constants.FacilityTypeEnum;
-using static FactoryModel.Models.Constants.FacilityTypeInfo;
+using static FactoryModel.Models.Constants.LinkType;
+using static FactoryModel.Models.Constants.TileTypeInfo;
 
 namespace FactoryModel.Builder {
 
@@ -18,11 +20,11 @@ namespace FactoryModel.Builder {
     ///  Used to update and change a Terrain.
     ///  As tiles are added to a 'change', they are modified for display.
     /// </summary>
-    public class TerrainManager {
+    public class BeltSiteManager {
 
         public Terrain Map {  get; set; } 
 
-        public FacilityPlan Plan {  get; set; } = new FacilityPlan();
+        public ConstructionPlan Plan {  get; set; } = new ConstructionPlan();
 
         public Tile LastTile { get; set; } = null;
 
@@ -41,17 +43,24 @@ namespace FactoryModel.Builder {
             Reset();
         }
 
-        /// <summary>
-        /// Facility values are copied into map, the plan is cleared.
-        /// </summary>
-        public void ApplyChange() {
 
-            foreach ( var tile in Plan.Values ) {
-                var loc = tile.Loc;
-                Map.Grid[ loc.X, loc.Y ].Facility = tile.Facility;
+        /// <summary>
+        /// Site values are copied into map, then the plan is cleared.
+        /// If a Site is going to be removed, then the plan contains an EmptySite.
+        /// </summary>
+        /// <returns>List[Where] location of all alterred tiles.</returns>
+        public List<Where> ApplyChange() {
+
+            var changeLocs = Plan.Keys.ToList();
+
+            foreach ( var planTile in Plan.Values ) {
+                var loc = planTile.Loc;
+                Map.Grid[ loc.X, loc.Y ].Site = planTile.Site;
             }
 
             Reset();
+
+            return changeLocs;
         }
 
 //=====================================================================================================================
@@ -60,23 +69,22 @@ namespace FactoryModel.Builder {
         /// 
         /// </summary>
         /// <param name="loc"></param>
-        /// <param name="facility">Template for first tile.  Ignored as we drag belts around.</param>
         /// <returns>List[Where] - locations changed by this change </returns>
         public List<Where> SubmitBeltToPlan( Where loc ) {
 
             var touched = new List<Where>();
             if (!Map.InBounds(loc)) return touched;
 
+            // we can only make changes over empty or existing belts.
+            // plan ONLY contains Belt sites for this manager.
             var tile = Map.Grid[loc.X,loc.Y];
+            if (NoBuildBelt( tile.Type )) return touched;
 
-            // cannot over-write existing facillities
-            if (tile.Facility!=FacilityTypeEnum.Empty) return touched;
+            var siteGroup = tile.Site.Group;
+            if (siteGroup!=SiteGroup.Empty && siteGroup!=SiteGroup.Belt) return touched;
 
-            // some terrain/facility combinations are illegal
-            if (tile.Type==TileTypeEnum.Sea) return touched;
-
-            // add change to plan
-            var work = new Tile(loc,FacilityTypeEnumInfo.DEFAULT_BELT_ENUM);
+            // setup plan tile for fixing links.
+            var work = Plan.FixBeltTile( loc, SiteTypeInfo.DEFAULT_BELT_ENUM );
             Plan.Put( work );
             touched.Add(loc);
 
@@ -152,27 +160,27 @@ namespace FactoryModel.Builder {
 
             var loc = work.Loc;
 
-            var northLink = GetLink( loc.X, loc.Y+1, (t) => FacilityTypeInfo.InverseSouthLink(t.Facility) );   // NORTH_STEP
-            var southLink = GetLink( loc.X, loc.Y-1, (t) => FacilityTypeInfo.InverseNorthLink(t.Facility) );   // SOUTH_STEP
-            var eastLink = GetLink( loc.X+1, loc.Y, (t) => FacilityTypeInfo.InverseWestLink(t.Facility) ); // EAST_STEP
-            var westLink = GetLink( loc.X-1, loc.Y, (t) => FacilityTypeInfo.InverseEastLink(t.Facility) ); // WEST_STEP
+            var northLink = GetLink( loc.X, loc.Y+1, (t) => SiteTypeInfo.InverseSouthLink(t.Site) );   // NORTH_STEP
+            var southLink = GetLink( loc.X, loc.Y-1, (t) => SiteTypeInfo.InverseNorthLink(t.Site) );   // SOUTH_STEP
+            var eastLink = GetLink( loc.X+1, loc.Y, (t) => SiteTypeInfo.InverseWestLink(t.Site) ); // EAST_STEP
+            var westLink = GetLink( loc.X-1, loc.Y, (t) => SiteTypeInfo.InverseEastLink(t.Site) ); // WEST_STEP
 
             // direction to previous tile, dragging
             if (drag!=null) { 
-                if ( EAST_STEP.Equals(drag) ) eastLink = FacilityTypeInfo.IN_LINK;
-                if ( WEST_STEP.Equals(drag) ) westLink = FacilityTypeInfo.IN_LINK;
-                if ( NORTH_STEP.Equals(drag) ) northLink = FacilityTypeInfo.IN_LINK;
-                if ( SOUTH_STEP.Equals(drag) ) southLink = FacilityTypeInfo.IN_LINK;
+                if ( EAST_STEP.Equals(drag) ) eastLink = IN_LINK;
+                if ( WEST_STEP.Equals(drag) ) westLink = IN_LINK;
+                if ( NORTH_STEP.Equals(drag) ) northLink = IN_LINK;
+                if ( SOUTH_STEP.Equals(drag) ) southLink = IN_LINK;
             }
 
-            var pick = FacilityTypeInfo.FacilityByDir[ northLink, southLink, eastLink, westLink ];
-            work.Facility = pick;
+            var pick = SiteTypeInfo.SiteByDir[ (int)northLink, (int)southLink, (int)eastLink, (int)westLink ];
+            work.Site = new BeltSite() { Type  = pick };
         }
 
 
-        internal int GetLink( int x,int y, Func<Tile,int> getter ) {
+        internal LinkType GetLink( int x,int y, Func<Tile,LinkType> getter ) {
             var key = new Where(x,y);
-            if (!Map.InBounds(key)) return FacilityTypeInfo.NO_LINK;
+            if (!Map.InBounds(key)) return NO_LINK;
             if (Plan.ContainsKey(key)) return getter( Plan[key] );
             return getter( Map.Grid[x,y] );
         }

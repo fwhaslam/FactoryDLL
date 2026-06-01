@@ -13,35 +13,37 @@ using System.Text;
 using System.Threading.Tasks;
 
 using FactoryModel.Builder;
+using FactoryModel.Tools;
 
 namespace FactoryModelTests.Builder {
 
     [TestClass]
-    public class MarketBulderTest {
+    public class MarketBuilderTest {
 
          [TestMethod]
         public void Build() {
 
             var builder = new MarketBuilder() { 
-                Rand = new Random(12345)
+                Rand = new RandTool(12345)
             };
-            builder.Size = 10;
+            builder.Limit = 10;
 
             //invoke
             builder.Build();
 
             // assertions
-            Console.WriteLine( "MARKET="+builder.Market.ToDisplay() );
+            Console.WriteLine( "MARKET="+builder.Trade.ToDisplay() );
         }
 
         [TestMethod]
         public void PickLength() {
 
             AreEqual( 0, MarketBuilder.PickLength( 1, 0.0f ) );
-            AreEqual( 0, MarketBuilder.PickLength( 1, 0.25f ) );
-            AreEqual( 1, MarketBuilder.PickLength( 1, 0.52f ) );
-            AreEqual( 2, MarketBuilder.PickLength( 1, 0.76f ) );
-            AreEqual( 3, MarketBuilder.PickLength( 1, 0.96f ) );
+            AreEqual( 0, MarketBuilder.PickLength( 1, 0.29f ) );
+            AreEqual( 1, MarketBuilder.PickLength( 1, 0.31f ) );
+            AreEqual( 1, MarketBuilder.PickLength( 1, 0.79f ) );
+            AreEqual( 2, MarketBuilder.PickLength( 1, 0.81f ) );
+            AreEqual( 2, MarketBuilder.PickLength( 1, 0.99f ) );
         }
     }
 

@@ -9,16 +9,11 @@ using System.Threading.Tasks;
 
 using FactoryModel.Models.Constants;
 
-using static FactoryModel.Models.RuleType;
-using static FactoryModel.Models.Constants.FacilityTypeEnum;
+using static FactoryModel.Models.Constants.RuleType;
+using static FactoryModel.Models.Constants.SiteType;
 
 namespace FactoryModel.Models {
 
-    public enum RuleType {
-        Make,       // product enter system
-        Vend,       // products exits system for money
-        Edit        // product changes from one to another
-    }
 
     /// <summary>
     /// Rules are Nodes.  Products are the links between them.
@@ -30,7 +25,7 @@ namespace FactoryModel.Models {
 
         public RuleType Type {  get; set; } = Edit;
 
-        public FacilityTypeEnum Facility { get; set; } = Empty;
+        public SiteType Facility { get; set; } = SiteType.None;
 
         public Recipe Ins { get; set; } =  new Recipe();
 

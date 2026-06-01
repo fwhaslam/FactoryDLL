@@ -6,13 +6,44 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static FactoryModel.Models.Constants.FacilityTypeEnum;
+using static FactoryModel.Models.Constants.SiteType;
 
 namespace FactoryModel.Models.Constants {
 
-    public enum FacilityTypeEnum {
-
+    public enum SiteGroup {
         Empty,
+        Belt, 
+        Make, 
+        Vend,
+        Edit,
+        Manage,
+        Event
+    };
+
+    public enum SiteType {
+
+        None,
+
+        // mark an existing facility as transitioning to None
+        // Remove,       // -- put an EmptySite into the PlanTile to remove something.
+
+        // management facilities
+        Managers,
+
+        // event facilities (spout=make, sink=vend)
+        EventCore,EventSpout,EventSink,
+
+        // product creation 1x1
+        MakerT1,
+
+        // product destruction 1x1
+        VendorT1,
+
+        // edit facilities ( currently maps to EditTypeEnum, but may replace )
+        EditOneVOne, EditOneVTwo, 
+        EditTwoVOne, EditTwoVTwo,
+        EditThreeVOne, EditThreeVTwo, EditThreeVThree, 
+        EditFiveVOne, EditFiveVThree, EditEightVOne, EditEightVThree,
 
         // 1 in, 1 out ( 12 total )
         BeltW2E,BeltE2N,BeltW2N,BeltS2N,BeltS2W,BeltS2E,
@@ -37,28 +68,14 @@ namespace FactoryModel.Models.Constants {
 
         // crossover
         CrossN2SxE2W, CrossS2NxE2W, CrossN2SxW2E, CrossS2NxW2E,
-        
-        // 1x1 single input processor
-        CrusherE2W,CrusherN2S, CrusherW2E, CrusherS2N,
-
-        // basic facilities which are mapped to EditTypes
-        EditOneVOne, EditOneVTwo, 
-        EditTwoVOne, EditTwoVTwo,
-        EditThreeVOne, EditThreeVTwo, EditThreeVThree, 
-        EditFiveVOne, EditFiveVThree, EditEightVOne, EditEightVThree,
-
-        // specific facility types
-        Haul,       // remove trash, or lowest tier product extractor
-        Dump        // drop trash, or lowest tier product vendor
     }
 
-    public static class FacilityTypeEnumInfo {
+    //public static class SiteTypeInfo {
 
-        public static FacilityTypeEnum DEFAULT_BELT_ENUM = BeltS2N;
+    //    public static SiteType DEFAULT_BELT_ENUM = BeltS2N;
 
-        // for IsBelt() range of values
-        public static FacilityTypeEnum BEFORE_BELTS = Empty;
-        public static FacilityTypeEnum AFTER_BELTS = CrossN2SxE2W;
-    }
+    //    public static int MAXIMUM_TIER_LIMIT = 6;
+
+    //}
 
 }

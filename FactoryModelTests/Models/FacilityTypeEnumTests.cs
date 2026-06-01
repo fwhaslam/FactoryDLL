@@ -9,18 +9,22 @@ using static VerboseCSharp.Asserts.StringAsserts;
 using System;
 using System.Linq;
 
+using System.Collections.Generic;
 using System.Text;
+
 using FactoryModel.Builder;
 
-using System.Collections.Generic;
-using static FactoryModel.Models.Constants.FacilityTypeEnum;
-using static FactoryModel.Models.Constants.FacilityTypeInfo;
 using FactoryModel.Models.Constants;
+using FactoryModel.Models.Sites;
+
+using static FactoryModel.Models.Constants.SiteType;
+using static FactoryModel.Models.Constants.SiteTypeInfo;
+using static FactoryModel.Models.Constants.LinkType;
 
 namespace FactoryModelTests.Models {
 
     [TestClass]
-    public class FacilityTypeEnumTests : FacilityTypeInfo {
+    public class FacilityTypeEnumTests : SiteTypeInfo {
 
         internal class FormInfo {
             internal string Name { get; set; }
@@ -34,6 +38,10 @@ namespace FactoryModelTests.Models {
             var outDelta = a.Out - b.Out;
 
             return 10 * inDelta + outDelta;
+        }
+
+        internal void FixBeltGrid(string[,,,] grid, LinkType nx, LinkType sx, LinkType ex, LinkType wx, string value ) {
+            grid[(int)nx,(int)sx,(int)ex,(int)wx] = value;
         }
 
         [TestMethod]
@@ -65,11 +73,11 @@ namespace FactoryModelTests.Models {
             var forms = new List<FormInfo>();
 
             var defaultBelt = new string[3,3,3,3];
-            for (int nx = 0; nx < 3; nx++) {
-                for (int sx = 0; sx < 3; sx++) {
-                    for (int ex = 0; ex < 3; ex++) {
+            for (LinkType nx = 0; nx < LinkTypeEnumCount; nx++) {
+                for (LinkType sx = 0; sx < LinkTypeEnumCount; sx++) {
+                    for (LinkType ex = 0; ex < LinkTypeEnumCount; ex++) {
 
-                        for (int wx = 0; wx < 3; wx++) {
+                        for (LinkType wx = 0; wx < LinkTypeEnumCount; wx++) {
 
                             var iNum = (nx==IN_LINK?1:0) + (sx==IN_LINK?1:0) + (ex==IN_LINK?1:0) + (wx==IN_LINK?1:0);
                             var oNum = (nx==OUT_LINK?1:0) + (sx==OUT_LINK?1:0) + (ex==OUT_LINK?1:0) + (wx==OUT_LINK?1:0);
@@ -96,7 +104,7 @@ namespace FactoryModelTests.Models {
                                 } );
                             }
 
-                            defaultBelt[nx,sx,ex,wx] = name;
+                            defaultBelt[(int)nx,(int)sx,(int)ex,(int)wx] = name;
                         }
                     }
                 }
@@ -104,49 +112,49 @@ namespace FactoryModelTests.Models {
 
             // replace 'empty' values with more useful defaults
             // no ins + no outs
-            defaultBelt[NO_LINK,NO_LINK,NO_LINK,NO_LINK] = "BeltS2N";   // see: DEFAULT_BELT_ENUM
+            FixBeltGrid( defaultBelt, NO_LINK,NO_LINK,NO_LINK,NO_LINK,  "BeltS2N");   // see: DEFAULT_BELT_ENUM
 
             // no outs
-            defaultBelt[IN_LINK,IN_LINK,IN_LINK,IN_LINK] = "BeltS2N";
+            FixBeltGrid( defaultBelt, IN_LINK,IN_LINK,IN_LINK,IN_LINK, "BeltS2N");
 
-            defaultBelt[IN_LINK,NO_LINK,NO_LINK,NO_LINK] = "BeltN2S";
-            defaultBelt[NO_LINK,IN_LINK,NO_LINK,NO_LINK] = "BeltS2N";
-            defaultBelt[NO_LINK,NO_LINK,IN_LINK,NO_LINK] = "BeltE2W";
-            defaultBelt[NO_LINK,NO_LINK,NO_LINK,IN_LINK] = "BeltW2E";
+            FixBeltGrid( defaultBelt, IN_LINK,NO_LINK,NO_LINK,NO_LINK, "BeltN2S");
+            FixBeltGrid( defaultBelt, NO_LINK,IN_LINK,NO_LINK,NO_LINK, "BeltS2N");
+            FixBeltGrid( defaultBelt, NO_LINK,NO_LINK,IN_LINK,NO_LINK, "BeltE2W");
+            FixBeltGrid( defaultBelt, NO_LINK,NO_LINK,NO_LINK,IN_LINK, "BeltW2E");
 
-            defaultBelt[IN_LINK,IN_LINK,NO_LINK,NO_LINK] = "BeltNS2E";
-            defaultBelt[NO_LINK,NO_LINK,IN_LINK,IN_LINK] = "BeltEW2N";
+            FixBeltGrid( defaultBelt, IN_LINK,IN_LINK,NO_LINK,NO_LINK, "BeltNS2E");
+            FixBeltGrid( defaultBelt, NO_LINK,NO_LINK,IN_LINK,IN_LINK, "BeltEW2N");
 
-            defaultBelt[NO_LINK,IN_LINK,IN_LINK,NO_LINK] = "BeltSE2W";
-            defaultBelt[IN_LINK,NO_LINK,NO_LINK,IN_LINK] = "BeltNW2E";
-            defaultBelt[IN_LINK,NO_LINK,IN_LINK,NO_LINK] = "BeltNE2S";
-            defaultBelt[NO_LINK,IN_LINK,NO_LINK,IN_LINK] = "BeltSW2N";
+            FixBeltGrid( defaultBelt, NO_LINK,IN_LINK,IN_LINK,NO_LINK, "BeltSE2W");
+            FixBeltGrid( defaultBelt, IN_LINK,NO_LINK,NO_LINK,IN_LINK, "BeltNW2E");
+            FixBeltGrid( defaultBelt, IN_LINK,NO_LINK,IN_LINK,NO_LINK, "BeltNE2S");
+            FixBeltGrid( defaultBelt, NO_LINK,IN_LINK,NO_LINK,IN_LINK, "BeltSW2N");
 
-            defaultBelt[IN_LINK,IN_LINK,IN_LINK,NO_LINK] = "BeltNSE2W";
-            defaultBelt[NO_LINK,IN_LINK,IN_LINK,IN_LINK] = "BeltSEW2N";
-            defaultBelt[IN_LINK,NO_LINK,IN_LINK,IN_LINK] = "BeltNEW2S";
-            defaultBelt[IN_LINK,IN_LINK,NO_LINK,IN_LINK] = "BeltNSW2E";
+            FixBeltGrid( defaultBelt, IN_LINK,IN_LINK,IN_LINK,NO_LINK, "BeltNSE2W");
+            FixBeltGrid( defaultBelt, NO_LINK,IN_LINK,IN_LINK,IN_LINK, "BeltSEW2N");
+            FixBeltGrid( defaultBelt, IN_LINK,NO_LINK,IN_LINK,IN_LINK, "BeltNEW2S");
+            FixBeltGrid( defaultBelt, IN_LINK,IN_LINK,NO_LINK,IN_LINK, "BeltNSW2E");
 
             // no ins
-            defaultBelt[OUT_LINK,OUT_LINK,OUT_LINK,OUT_LINK] = "BeltS2N";
+            FixBeltGrid( defaultBelt, OUT_LINK,OUT_LINK,OUT_LINK,OUT_LINK, "BeltS2N");
 
-            defaultBelt[OUT_LINK,NO_LINK,NO_LINK,NO_LINK] = "BeltS2N";
-            defaultBelt[NO_LINK,OUT_LINK,NO_LINK,NO_LINK] = "BeltN2S";
-            defaultBelt[NO_LINK,NO_LINK,OUT_LINK,NO_LINK] = "BeltW2E";
-            defaultBelt[NO_LINK,NO_LINK,NO_LINK,OUT_LINK] = "BeltE2W";
+            FixBeltGrid( defaultBelt, OUT_LINK,NO_LINK,NO_LINK,NO_LINK, "BeltS2N");
+            FixBeltGrid( defaultBelt, NO_LINK,OUT_LINK,NO_LINK,NO_LINK, "BeltN2S");
+            FixBeltGrid( defaultBelt, NO_LINK,NO_LINK,OUT_LINK,NO_LINK, "BeltW2E");
+            FixBeltGrid( defaultBelt, NO_LINK,NO_LINK,NO_LINK,OUT_LINK, "BeltE2W");
 
-            defaultBelt[OUT_LINK,OUT_LINK,NO_LINK,NO_LINK] = "BeltW2NS";
-            defaultBelt[NO_LINK,NO_LINK,OUT_LINK,OUT_LINK] = "BeltS2EW";
+            FixBeltGrid( defaultBelt, OUT_LINK,OUT_LINK,NO_LINK,NO_LINK, "BeltW2NS");
+            FixBeltGrid( defaultBelt, NO_LINK,NO_LINK,OUT_LINK,OUT_LINK, "BeltS2EW");
 
-            defaultBelt[NO_LINK,OUT_LINK,OUT_LINK,NO_LINK] = "BeltN2SE";
-            defaultBelt[OUT_LINK,NO_LINK,NO_LINK,OUT_LINK] = "BeltS2NW";
-            defaultBelt[OUT_LINK,NO_LINK,OUT_LINK,NO_LINK] = "BeltW2NE";
-            defaultBelt[NO_LINK,OUT_LINK,NO_LINK,OUT_LINK] = "BeltE2SW";
+            FixBeltGrid( defaultBelt, NO_LINK,OUT_LINK,OUT_LINK,NO_LINK, "BeltN2SE");
+            FixBeltGrid( defaultBelt, OUT_LINK,NO_LINK,NO_LINK,OUT_LINK, "BeltS2NW");
+            FixBeltGrid( defaultBelt, OUT_LINK,NO_LINK,OUT_LINK,NO_LINK, "BeltW2NE");
+            FixBeltGrid( defaultBelt, NO_LINK,OUT_LINK,NO_LINK,OUT_LINK, "BeltE2SW");
 
-            defaultBelt[OUT_LINK,OUT_LINK,OUT_LINK,NO_LINK] = "BeltW2NSE";
-            defaultBelt[NO_LINK,OUT_LINK,OUT_LINK,OUT_LINK] = "BeltN2SEW";
-            defaultBelt[OUT_LINK,NO_LINK,OUT_LINK,OUT_LINK] = "BeltS2NEW";
-            defaultBelt[OUT_LINK,OUT_LINK,NO_LINK,OUT_LINK] = "BeltE2NSW";
+            FixBeltGrid( defaultBelt, OUT_LINK,OUT_LINK,OUT_LINK,NO_LINK, "BeltW2NSE");
+            FixBeltGrid( defaultBelt, NO_LINK,OUT_LINK,OUT_LINK,OUT_LINK, "BeltN2SEW");
+            FixBeltGrid( defaultBelt, OUT_LINK,NO_LINK,OUT_LINK,OUT_LINK, "BeltS2NEW");
+            FixBeltGrid( defaultBelt, OUT_LINK,OUT_LINK,NO_LINK,OUT_LINK, "BeltE2NSW");
 
 
             // sort the usable form list by in/out counts
@@ -201,40 +209,37 @@ namespace FactoryModelTests.Models {
         [TestMethod]
         public void IsBelt() {
 
-            IsTrue( FacilityTypeInfo.IsBelt( BeltE2W ) ); 
-            IsTrue( FacilityTypeInfo.IsBelt( BeltSE2N ) ); 
-            IsTrue( FacilityTypeInfo.IsBelt( BeltNSW2E ) ); 
+            var beltNo = new EmptySite() { };
+            var beltYes = new BeltSite() { };
 
-
-            IsFalse( FacilityTypeInfo.IsBelt( Empty ) ); 
-            IsFalse( FacilityTypeInfo.IsBelt( CrossN2SxE2W ) ); 
-            IsFalse( FacilityTypeInfo.IsBelt( CrusherW2E ) ); 
+            IsTrue( SiteTypeInfo.IsBelt( beltYes ) ); 
+            IsFalse( SiteTypeInfo.IsBelt( beltNo ) ); 
 
         }
 
         [TestMethod]
         public void EastDir() {
 
-            AreEqual( IN_LINK, FacilityTypeInfo.EastLink( BeltE2W ) ); 
-            AreEqual( OUT_LINK, FacilityTypeInfo.EastLink( BeltW2E ) ); 
-            AreEqual( NO_LINK, FacilityTypeInfo.EastLink( BeltN2S ) ); 
+            AreEqual( IN_LINK, SiteTypeInfo.EastLink( new BeltSite(){ Type=BeltE2W } ) ); 
+            AreEqual( OUT_LINK, SiteTypeInfo.EastLink( new BeltSite(){ Type=BeltW2E } ) ); 
+            AreEqual( NO_LINK, SiteTypeInfo.EastLink( new BeltSite(){ Type=BeltN2S } ) ); 
 
-            AreEqual( IN_LINK, FacilityTypeInfo.EastLink( BeltNE2W ) ); 
-            AreEqual( OUT_LINK, FacilityTypeInfo.EastLink( BeltW2SE ) ); 
-            AreEqual( NO_LINK, FacilityTypeInfo.EastLink( BeltN2SW ) ); 
+            AreEqual( IN_LINK, SiteTypeInfo.EastLink( new BeltSite(){ Type=BeltNE2W } ) ); 
+            AreEqual( OUT_LINK, SiteTypeInfo.EastLink( new BeltSite(){ Type=BeltW2SE } ) ); 
+            AreEqual( NO_LINK, SiteTypeInfo.EastLink( new BeltSite(){ Type=BeltN2SW } ) ); 
 
         }
 
         [TestMethod]
         public void NorthDir() {
 
-            AreEqual( IN_LINK, FacilityTypeInfo.NorthLink( BeltN2W ) ); 
-            AreEqual( OUT_LINK, FacilityTypeInfo.NorthLink( BeltW2N ) ); 
-            AreEqual( NO_LINK, FacilityTypeInfo.NorthLink( BeltE2S ) ); 
+            AreEqual( IN_LINK, SiteTypeInfo.NorthLink(  new BeltSite(){ Type=BeltN2W } ) ); 
+            AreEqual( OUT_LINK, SiteTypeInfo.NorthLink(  new BeltSite(){ Type=BeltW2N } ) ); 
+            AreEqual( NO_LINK, SiteTypeInfo.NorthLink(  new BeltSite(){ Type=BeltE2S } ) ); 
 
-            AreEqual( IN_LINK, FacilityTypeInfo.NorthLink( BeltNE2W ) ); 
-            AreEqual( OUT_LINK, FacilityTypeInfo.NorthLink( BeltW2NS ) ); 
-            AreEqual( NO_LINK, FacilityTypeInfo.NorthLink( BeltS2EW ) ); 
+            AreEqual( IN_LINK, SiteTypeInfo.NorthLink(  new BeltSite(){ Type=BeltNE2W } ) ); 
+            AreEqual( OUT_LINK, SiteTypeInfo.NorthLink(  new BeltSite(){ Type=BeltW2NS } ) ); 
+            AreEqual( NO_LINK, SiteTypeInfo.NorthLink(  new BeltSite(){ Type=BeltS2EW } ) ); 
 
         }
     }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FactoryModel.Models.Constants;
+using FactoryModel.Models.Sites;
 
 namespace FactoryModel.Models {
 
@@ -24,18 +25,18 @@ namespace FactoryModel.Models {
             Loc = loc;
         }
 
-        public Tile( Where loc, FacilityTypeEnum facility ) {
+        public Tile( Where loc, Sites.Site facility ) {
             Loc = loc;
-            Facility = facility;
+            Site = facility;
         }
 
         public Where Loc { get; set; } = Where.NOWHERE;
 
-        public TileTypeEnum Type { get; set; } = TileTypeEnum.Plains;
+        public TileType Type { get; set; } = TileType.Plains;
 
         public int Height { get; set; } = 0;
 
-        public FacilityTypeEnum Facility { get; set; } = FacilityTypeEnum.Empty;
+        public Sites.Site Site { get; set; } = new EmptySite();
 
     }
 }
